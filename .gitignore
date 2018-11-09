@@ -1,2 +1,9 @@
-data.csv
-.ipynb_checkpoints
+
+/.env
+/data.csv
+/bin
+/include
+/lib
+/.ipynb_checkpoints
+/delphi
+
