@@ -1,7 +1,9 @@
-.env
 
+/.env
+/data.csv
 /bin
 /include
 /lib
-
+/.ipynb_checkpoints
 /delphi
+
