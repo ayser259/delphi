@@ -66,6 +66,9 @@ social_dict = {
 }
 # Renaming columns
 data = data.rename(index=str,columns = column_dict)
+# Updating a few rows of data due to incorrect initial survey deployment
+for i in range(0,12):
+    data.faculty[i]='Engineering'
 # Extracting data for only engineering students
 data = data[data['faculty']=="Engineering"]
 
