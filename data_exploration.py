@@ -87,26 +87,27 @@ data.screen_time = data.screen_time.map(screen_dict)
 ## 4 ## Code block
 
 # Defining methods to help normaliz the data
-def normalize_3_variables(data,x,y,column,hue):
-    normalized_data = data[[x,y,column,hue]]
+def normalize_3_variables(df3,x,y,column,hue):
+    normalized_data = df3[[x,y,column,hue]]
     normalized_data = normalized_data.groupby([x,y,column,hue],as_index=False).size().reset_index()
     normalized_data = normalized_data.rename(index=str,columns = {0:"percent"})
     normalized_data["percent"] = 100*(normalized_data["percent"]/sum(normalized_data["percent"]))
     return normalized_data
 
-def normalize_2_variables(data,x,y,column):
-    normalized_data = data[[x,y,column]]
+def normalize_2_variables(df2,x,y,column):
+    normalized_data = df2[[x,y,column]]
     normalized_data = normalized_data.groupby([x,y,column],as_index=False).size().reset_index()
     normalized_data = normalized_data.rename(index=str,columns = {0:"percent"})
     normalized_data["percent"] = 100*(normalized_data["percent"]/sum(normalized_data["percent"]))
     return normalized_data
 
-def normalize_1_variables(data,x,y):
-    normalized_data = data[[x,y]]
+def normalize_1_variables(df1,x,y):
+    normalized_data = df1[[x,y]]
     normalized_data = normalized_data.groupby([x,y],as_index=False).size().reset_index()
     normalized_data = normalized_data.rename(index=str,columns = {0:"percent"})
     normalized_data["percent"] = 100*(normalized_data["percent"]/sum(normalized_data["percent"]))
     return normalized_data
+
 
 ## 5 ## Code Block
 
