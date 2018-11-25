@@ -108,5 +108,11 @@ def get_one_hot_encoded_data(directory,drop_pref=False):
     df = get_clean_data(directory)
     if drop_pref == True:
         df = df[df['current_average']!='Prefer not to say']
+
+    keys = df['current_average'].unique()
+    le = preprocessing.LabelEncoder()
+    le.fit(list(keys))
+    df['current_average'] = le.transform(list(df['current_average']))
+
     df = pd.get_dummies(df)
     return df
