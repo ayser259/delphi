@@ -1,5 +1,5 @@
-from sklearn.naive_bayes import MultinomialNB
 from sklearn import preprocessing
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score,train_test_split
 from sklearn.metrics import accuracy_score
 
@@ -11,17 +11,8 @@ df = get_encoded_data('data.csv')[0]
 x_df = df.drop(axis=1,columns=["current_average"])
 y_df = df["current_average"]
 
-# Basic train test split:
-'''
-x_train,x_test,y_train,y_test = train_test_split(x_df,y_df,test_size=0.1)
-
-mnb = MultinomialNB()
-mnb.fit(x_train,y_train)
-
-y_predicted = mnb.predict(x_test)
-print(accuracy_score(y_test,y_predicted))
-'''
 # Cross validation test train split
-mnb = MultinomialNB()
-cvs = cross_val_score(mnb,x_df,y_df,cv=2)
+clf = LogisticRegression(random_state=0, solver='lbfgs',
+                            multi_class='multinomial').fit(x_df, y_df)
+cvs = cross_val_score(clf,x_df,y_df,cv=2)
 print("Accuracy: %0.2f (+/- %0.2f)" % (cvs.mean(), cvs.std() * 2))
