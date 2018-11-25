@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn import preprocessing
 
 def get_clean_data(directory):
     # Reading data from the data source
@@ -27,6 +28,13 @@ def get_clean_data(directory):
         'International (You are not a Canadian Citizen and are here on a Visa)':'Internationl',
         '1st Generation Canadian Citizen (You were not born in Canada and You are a Canadian Citizen)':'1st_Gen',
         '2nd+ Generation Canadian Citizen (You were born in Canada and you are a Canadian Citizen)':'2nd+_Gen'
+    }
+    # Dictionary for Changing nationality
+    current_year_dict = {
+        1:'1',
+        2:'2',
+        3:'3',
+        4:'4'
     }
     #  Dictionary for Changing sleep time answers for readability
     sleep_dict = {
@@ -56,17 +64,72 @@ def get_clean_data(directory):
     }
     # Renaming columns
     data = data.rename(index=str,columns = column_dict)
-    # Updating a few rows of data due to incorrect initial survey deployment
-    # for i in range(0,12):
-    #     data.faculty[i]='Engineering'
 
-    # Extracting data for only engineering students
+    # Extracting data for only engineering students in year 2+
     data = data[data['faculty']=="Engineering"]
+    data = data[data['current_year']!=1]
+
     data = data.drop(axis=1,columns=["Enter your email address OR phone number if you'd like to be entered for a chance to win 1 of 4 $20 amazon gift cards"])
+    data = data.drop(axis=1,columns=["Timestamp"])
+    data = data.drop(axis=1,columns=["faculty"])
     # Updating column values for readability
     data.nationality_status = data.nationality_status.map(nationality_dict)
     data.sleep_time = data.sleep_time.map(sleep_dict)
     data.social_time = data.social_time.map(social_dict)
     data.coop_time = data.coop_time.map(coop_dict)
     data.screen_time = data.screen_time.map(screen_dict)
+    data.current_year = data.current_year.map(current_year_dict)
+
+    data = data.dropna(axis=0,how='any')
+
     return data
+
+def get_encoded_data(directory,drop_pref=False):
+    df = get_clean_data(directory)
+
+    if drop_pref == True:
+        df = df[df['current_average']!='Prefer not to say']
+
+    col_list = list(df.columns)
+    encoded_dict_list = []
+    for col in col_list:
+        keys = df[col].unique()
+        le = preprocessing.LabelEncoder()
+        le.fit(list(keys))
+        df[col] = le.transform(list(df[col]))
+        vals = df[col].unique()
+        keys = list(le.inverse_transform(vals))
+        cd = dict(zip(keys,vals))
+        cd['column'] = col
+        encoded_dict_list.append(cd)
+    return [df,encoded_dict_list]
+
+def get_one_hot_encoded_data(directory,drop_pref=False):
+    df = get_clean_data(directory)
+    if drop_pref == True:
+        df = df[df['current_average']!='Prefer not to say']
+
+    keys = df['current_average'].unique()
+    le = preprocessing.LabelEncoder()
+    le.fit(list(keys))
+    df['current_average'] = le.transform(list(df['current_average']))
+
+    df = pd.get_dummies(df)
+    return df
+
+def merged_encoding(directory,label_encode,one_hot_encode,drop_pref=False):
+
+    df = get_clean_data(directory)
+
+    if drop_pref == True:
+        df = df[df['current_average']!='Prefer not to say']
+
+    for col in label_encode:
+        keys = df[col].unique()
+        le = preprocessing.LabelEncoder()
+        le.fit(list(keys))
+        df[col] = le.transform(list(df[col]))
+
+    df = pd.get_dummies(df,columns=one_hot_encode)
+
+    return df
