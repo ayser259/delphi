@@ -116,3 +116,20 @@ def get_one_hot_encoded_data(directory,drop_pref=False):
 
     df = pd.get_dummies(df)
     return df
+
+def merged_encoding(directory,label_encode,one_hot_encode,drop_pref=False):
+
+    df = get_clean_data(directory)
+
+    if drop_pref == True:
+        df = df[df['current_average']!='Prefer not to say']
+
+    for col in label_encode:
+        keys = df[col].unique()
+        le = preprocessing.LabelEncoder()
+        le.fit(list(keys))
+        df[col] = le.transform(list(df[col]))
+
+    df = pd.get_dummies(df,columns=one_hot_encode)
+
+    return df
