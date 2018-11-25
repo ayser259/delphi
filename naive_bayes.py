@@ -10,4 +10,3 @@ df = get_clean_data('data.csv')
 
 x_df = df.drop(axis=1,columns=["current_average"])
 y_df = df["current_average"]
-g
