@@ -59,8 +59,8 @@ def get_clean_data(directory):
 
     # Extracting data for only engineering students in year 2+
     data = data[data['faculty']=="Engineering"]
-    data = data[data['current_year']!="1"]
-    
+    data = data[data['current_year']!=1]
+
     data = data.drop(axis=1,columns=["Enter your email address OR phone number if you'd like to be entered for a chance to win 1 of 4 $20 amazon gift cards"])
     data = data.drop(axis=1,columns=["Timestamp"])
     # Updating column values for readability
@@ -70,6 +70,24 @@ def get_clean_data(directory):
     data.coop_time = data.coop_time.map(coop_dict)
     data.screen_time = data.screen_time.map(screen_dict)
 
+    col_list = data.columns
+    for col in col_list:
+        try:
+            data[col].replace('', np.nan,inplace=True)
+            data[col].replace(' ', np.nan,inplace=True)
+            data[col].replace('  ', np.nan,inplace=True)
+        except:
+            x=1
+    print(len(data))
     data.dropna(axis=0,how='any')
+    data = data[~data[data.columns.values].isnull()]
+    data = data[~data.isin(['NaN','NaT','na','NAN','nan','',' ',"NaN",'']).any(axis=1)]
+    print(data.columns)
+    data.to_csv('ayser.csv')
+    ds = list(data["class_attendance"].unique())
+    for d in ds:
+        print(d)
+
+    print(len(data))
 
     return data
