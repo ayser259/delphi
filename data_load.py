@@ -73,3 +73,22 @@ def get_clean_data(directory):
     data = data.dropna(axis=0,how='any')
 
     return data
+
+
+def get_encoded_data(directory):
+    df = get_clean_data(directory)
+
+    col_list = list(df.columns)
+    encoded_dict_list = []
+    for col in col_list:
+        if col!= "Timestamp":
+            keys = df[col].unique()
+            le = preprocessing.LabelEncoder()
+            le.fit(list(keys))
+            df[col] = le.transform(list(df[col]))
+            vals = df[col].unique()
+            keys = list(le.inverse_transform(vals))
+            cd = dict(zip(keys,vals))
+            cd['column'] = col
+            encoded_dict_list.append(cd)
+    return [df,encoded_dict_list]

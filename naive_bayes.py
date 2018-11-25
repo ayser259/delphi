@@ -5,21 +5,8 @@ from sklearn.metrics import accuracy_score
 
 from data_load import get_clean_data
 
-df = get_clean_data('data.csv')
-
-col_list = list(df.columns)
-encoded_dict_list = []
-for col in col_list:
-    if col!= "Timestamp":
-        keys = df[col].unique()
-        le = preprocessing.LabelEncoder()
-        le.fit(list(keys))
-        df[col] = le.transform(list(df[col]))
-        vals = df[col].unique()
-        keys = list(le.inverse_transform(vals))
-        cd = dict(zip(keys,vals))
-        cd['column'] = col
-        encoded_dict_list.append(cd)
+df = get_encoded_data('data.csv')[0]
+# encoded_dict_list = get_encoded_data('data.csv')[1]
 
 x_df = df.drop(axis=1,columns=["current_average"])
 y_df = df["current_average"]
