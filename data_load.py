@@ -70,24 +70,6 @@ def get_clean_data(directory):
     data.coop_time = data.coop_time.map(coop_dict)
     data.screen_time = data.screen_time.map(screen_dict)
 
-    col_list = data.columns
-    for col in col_list:
-        try:
-            data[col].replace('', np.nan,inplace=True)
-            data[col].replace(' ', np.nan,inplace=True)
-            data[col].replace('  ', np.nan,inplace=True)
-        except:
-            x=1
-    print(len(data))
-    data.dropna(axis=0,how='any')
-    data = data[~data[data.columns.values].isnull()]
-    data = data[~data.isin(['NaN','NaT','na','NAN','nan','',' ',"NaN",'']).any(axis=1)]
-    print(data.columns)
-    data.to_csv('ayser.csv')
-    ds = list(data["class_attendance"].unique())
-    for d in ds:
-        print(d)
-
-    print(len(data))
+    data = data.dropna(axis=0,how='any')
 
     return data
