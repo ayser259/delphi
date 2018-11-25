@@ -56,17 +56,20 @@ def get_clean_data(directory):
     }
     # Renaming columns
     data = data.rename(index=str,columns = column_dict)
-    # Updating a few rows of data due to incorrect initial survey deployment
-    # for i in range(0,12):
-    #     data.faculty[i]='Engineering'
 
-    # Extracting data for only engineering students
+    # Extracting data for only engineering students in year 2+
     data = data[data['faculty']=="Engineering"]
+    data = data[data['current_year']!="1"]
+    
     data = data.drop(axis=1,columns=["Enter your email address OR phone number if you'd like to be entered for a chance to win 1 of 4 $20 amazon gift cards"])
+    data = data.drop(axis=1,columns=["Timestamp"])
     # Updating column values for readability
     data.nationality_status = data.nationality_status.map(nationality_dict)
     data.sleep_time = data.sleep_time.map(sleep_dict)
     data.social_time = data.social_time.map(social_dict)
     data.coop_time = data.coop_time.map(coop_dict)
     data.screen_time = data.screen_time.map(screen_dict)
+
+    data.dropna(axis=0,how='any')
+
     return data
