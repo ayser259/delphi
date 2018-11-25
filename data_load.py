@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn import preprocessing
 
 def get_clean_data(directory):
     # Reading data from the data source
