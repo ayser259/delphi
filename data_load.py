@@ -29,6 +29,13 @@ def get_clean_data(directory):
         '1st Generation Canadian Citizen (You were not born in Canada and You are a Canadian Citizen)':'1st_Gen',
         '2nd+ Generation Canadian Citizen (You were born in Canada and you are a Canadian Citizen)':'2nd+_Gen'
     }
+    # Dictionary for Changing nationality
+    current_year_dict = {
+        1:'1',
+        2:'2',
+        3:'3',
+        4:'4'
+    }
     #  Dictionary for Changing sleep time answers for readability
     sleep_dict = {
         "Not enough (I'm always tired)":"Not Enough",
@@ -64,32 +71,42 @@ def get_clean_data(directory):
 
     data = data.drop(axis=1,columns=["Enter your email address OR phone number if you'd like to be entered for a chance to win 1 of 4 $20 amazon gift cards"])
     data = data.drop(axis=1,columns=["Timestamp"])
+    data = data.drop(axis=1,columns=["faculty"])
     # Updating column values for readability
     data.nationality_status = data.nationality_status.map(nationality_dict)
     data.sleep_time = data.sleep_time.map(sleep_dict)
     data.social_time = data.social_time.map(social_dict)
     data.coop_time = data.coop_time.map(coop_dict)
     data.screen_time = data.screen_time.map(screen_dict)
+    data.current_year = data.current_year.map(current_year_dict)
 
     data = data.dropna(axis=0,how='any')
 
     return data
 
-
-def get_encoded_data(directory):
+def get_encoded_data(directory,drop_pref=False):
     df = get_clean_data(directory)
+
+    if drop_pref == True:
+        df = df[df['current_average']!='Prefer not to say']
 
     col_list = list(df.columns)
     encoded_dict_list = []
     for col in col_list:
-        if col!= "Timestamp":
-            keys = df[col].unique()
-            le = preprocessing.LabelEncoder()
-            le.fit(list(keys))
-            df[col] = le.transform(list(df[col]))
-            vals = df[col].unique()
-            keys = list(le.inverse_transform(vals))
-            cd = dict(zip(keys,vals))
-            cd['column'] = col
-            encoded_dict_list.append(cd)
+        keys = df[col].unique()
+        le = preprocessing.LabelEncoder()
+        le.fit(list(keys))
+        df[col] = le.transform(list(df[col]))
+        vals = df[col].unique()
+        keys = list(le.inverse_transform(vals))
+        cd = dict(zip(keys,vals))
+        cd['column'] = col
+        encoded_dict_list.append(cd)
     return [df,encoded_dict_list]
+
+def get_one_hot_encoded_data(directory,drop_pref=False):
+    df = get_clean_data(directory)
+    if drop_pref == True:
+        df = df[df['current_average']!='Prefer not to say']
+    df = pd.get_dummies(df)
+    return df
