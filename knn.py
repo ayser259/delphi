@@ -3,11 +3,12 @@ import pandas as pd
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_val_score,train_test_split,LeaveOneOut
+from sklearn.feature_selection import SelectFromModel
 from sklearn.neighbors import KNeighborsClassifier
 
 from data_load import get_encoded_data,get_one_hot_encoded_data
 
-# Label Encoded Data
+###=============================== KNN Full Data Label Encoded  ============
 
 df = get_encoded_data('data.csv')[0]
 # encoded_dict_list = get_encoded_data('data.csv')[1]
@@ -32,10 +33,10 @@ for train_index, test_index in loo.split(X):
   model = KNN.fit(X_train, y_train)
   accuracy.append(KNN.score(X_test, y_test))
 
-label_mean = np.array(accuracy).mean()
-label_variance = np.array(accuracy).std() * 2
+KNN_FD_LE_mean = np.array(accuracy).mean()
+KNN_FD_LE_variance = np.array(accuracy).std() * 2
 
-# One Hot Encoded
+###============================== KNN Full Data One Hot Encoded  ==============
 df = get_one_hot_encoded_data('data.csv')
 x_df = df.drop(axis=1,columns=["current_average"])
 y_df = df["current_average"]
@@ -58,9 +59,9 @@ for train_index, test_index in loo.split(X):
   accuracy.append(KNN.score(X_test, y_test))
 
 # Calculate accuracy
-ohe_mean = np.array(accuracy).mean()
-ohe_variance = np.array(accuracy).std() * 2
+KNN_FD_OH_mean = np.array(accuracy).mean()
+KNN_FD_OH_variance = np.array(accuracy).std() * 2
 
 #Printing Results
-print("Label Encoded LOO CV Accuracy: %0.2f (+/- %0.2f)" % (label_mean, label_variance))
-print("One Hot Encoded LOO CV Accuracy: %0.2f (+/- %0.2f)" % (ohe_mean, ohe_variance))
+print("[KNN,Full Data,Label Encoded] Accuracy: %0.2f (+/- %0.2f)" % (KNN_FD_LE_mean, KNN_FD_LE_variance))
+print("[KNN,Full Data,One Hot Encoded] Accuracy: %0.2f (+/- %0.2f)" % (KNN_FD_OH_mean, KNN_FD_OH_variance))
