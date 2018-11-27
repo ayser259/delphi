@@ -27,16 +27,8 @@ df['academic_priority'] = 'academic_priority_' + df['academic_priority'].astype(
 df['current_average'] = 'current_average_' + df['current_average'].astype(str)
 
 
-df.to_csv("output.csv",header=False,index=False, columns=['hs_average','nationality_status','parent1_education','parent2_education','social_time',
-'class_attendance','screen_time','sleep_time','excercise_time','school_work_time','coop_time','academic_priority','current_average'])
+df.to_csv("output.csv",header=False,index=False, columns=['hs_average','nationality_status','parent1_education','parent2_education','social_time','screen_time','sleep_time','excercise_time','school_work_time','coop_time','academic_priority','current_average'])
 
-# changes current_year category to object type
-# betty['current_year'] = betty.current_year.astype('object')
-
-# print(betty)
-# print(betty.dtypes)
-# df = betty.values
-# print(type(df))
 
 
 # Reads the output.csv created from above and puts the data into a list of lists
@@ -45,33 +37,30 @@ with open('output.csv') as f:
     reader = csv.reader(f)
     for row in reader: 
         dataset.append(row)
-for row in dataset:
-    print(row)
 
-# Creates some type of datastructure with the row being each student, and the columns being
+
+# Creates a dataframe with the row being each student, and the columns being
 # every single possibile value with true or false depending if the user falls into that category
 oht = mlx.TransactionEncoder()
 oht_ary = oht.fit(dataset).transform(dataset)
 df = pd.DataFrame(oht_ary, columns=oht.columns_)
 
 # Creates a set of items with a min support as specified by the min_support param
-frequent_itemSets = apriori(df,min_support=0.07, use_colnames=True)
-# print(frequent_itemSets)
+frequent_itemSets = apriori(df,min_support=0.03, use_colnames=True)
 
-rules = association_rules(frequent_itemSets, metric="confidence", min_threshold=0.90)
+# Only looks at the association rules with more then 2 items
+frequent_itemSets['length'] = frequent_itemSets['itemsets'].apply(lambda x: len(x))
+frequent_itemSets[ (frequent_itemSets['length'] >= 2) ]
+# print(frequent_itemSets[ (frequent_itemSets['length'] >= 2) ])
 
-rules[['antecedents','consequents','support','confidence']].to_csv("apriori-output.csv")
+#Creates rules based off the min_threshold
+rules = association_rules(frequent_itemSets, metric="confidence", min_threshold=0.95)
+
+
 
 print(rules[['antecedents','consequents','support','confidence']])
+rules[['antecedents','consequents','support','confidence']].to_csv("apriori-output.csv")
 
 
 
 
-
-
-
-# Random Finding
-# I need to take out the engineering faculty because it's creating a bunch of associaition rules regarding engineering when 100% of the people are in engineering anyways
-
-# Also with a support of 0.01 and min threshold of 90, there was 1.4 mill association rules.. the support should be higher because the data set size is small! 
-#
